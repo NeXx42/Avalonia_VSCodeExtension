@@ -1,6 +1,6 @@
 {
   "name": "vscode-avalonia",
-  "displayName": "Avalonia for VSCode",
+  "displayName": "Avalonia for VSCode (Nexx)",
   "description": "Avalonia tools for Visual Studio Code",
   "publisher": "AvaloniaTeam",
   "version": "0.0.32",
@@ -34,7 +34,7 @@
     "url": "https://github.com/AvaloniaUI/AvaloniaVSCode"
   },
   "activationEvents": [
-    "workspaceContains:**/*.axaml",
+    "workspaceContains:**/*.{axaml,xml}",
     "onLanguage:axaml"
   ],
   "main": "./out/extension.js",
@@ -92,7 +92,7 @@
     "menus": {
       "editor/title": [
         {
-          "when": "editorLangId == AXAML",
+          "when": "editorLangId == AXAML || editorLangId == xml",
           "command": "avalonia.showPreviewToSide",
           "group": "navigation"
         }
@@ -100,7 +100,7 @@
       "commandPalette": [
         {
           "command": "avalonia.showPreviewToSide",
-          "when": "resourceLangId == AXAML",
+          "when": "editorLangId == AXAML || editorLangId == xml",
           "group": "Avalonia"
         }
       ]
