@@ -55,22 +55,23 @@ jobs:
         working-directory: ${{ env.EXT_DIR }}
         run: npm ci
 
-      - name: Restore .NET
-        run: dotnet restore
-
+      - name: Restore Avalonia Language Server
+        run: dotnet restore src/AvaloniaLSP/AvaloniaLanguageServer/AvaloniaLanguageServer.csproj
+        
       - name: Build Avalonia Language Server
-        working-directory: ${{ env.EXT_DIR }}
         run: |
-          dotnet build ../AvaloniaLSP/AvaloniaLanguageServer/AvaloniaLanguageServer.csproj \
+          dotnet build src/AvaloniaLSP/AvaloniaLanguageServer/AvaloniaLanguageServer.csproj \
             -c Release \
             --no-restore \
             --output $EXT_DIR/avaloniaServer
 
-
+            
+      - name: Restore Solution Parser
+        run: dotnet restore src/AvaloniaLSP/AvaloniaLanguageServer/AvaloniaLanguageServer.csproj
+            
       - name: Build Solution Parser
-        working-directory: ${{ env.EXT_DIR }}
         run: |
-          dotnet build ../SolutionParser/SolutionParser.csproj \
+          dotnet build src/SolutionParser/SolutionParser.csproj \
             -c Release \
             --no-restore \
             --output $EXT_DIR/solutionParserTool
