@@ -5,7 +5,7 @@ on:
     inputs:
       version:
         description: "Release version (1.2.3)."
-        required: false
+        required: true
         type: string
 
 permissions:
@@ -76,9 +76,7 @@ jobs:
 
       - name: Set extension version
         working-directory: ${{ env.EXT_DIR }}
-        run: |
-          VERSION=${GITHUB_REF_NAME#v}
-          npm version $VERSION --no-git-tag-version
+        run: npm version "${{ github.event.inputs.version }}" --no-git-tag-version
 
       - name: Package extension
         working-directory: ${{ env.EXT_DIR }}
