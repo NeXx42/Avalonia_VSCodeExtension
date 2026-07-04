@@ -71,7 +71,7 @@ function updateSolutionModel(context: vscode.ExtensionContext, jsonContect: stri
 }
 
 async function getSolutionFile(): Promise<string | undefined> {
-	const filePattern = "**/*.sln";
+	const filePattern = "**/*.{sln, slnx}";
 	const files = await vscode.workspace.findFiles(filePattern);
 
 	if (files.length > 0) {
@@ -143,7 +143,7 @@ async function parseSolution(context: vscode.ExtensionContext): Promise<string> 
 					reject(error);
 				}
 				resolve(jsonContent);
-			}			
+			}
 			else {
 				if (errorData.length === 0)
 					errorData = `Solution parser process exited with code ${code}`;

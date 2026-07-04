@@ -1,0 +1,103 @@
+name: Build and Release VSCode Extension
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      EXT_DIR: src/vscode-avalonia
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            npm-
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-
+
+      - name: Install dependencies
+        working-directory: ${{ env.EXT_DIR }}
+        run: npm ci
+
+      - name: Restore .NET
+        run: dotnet restore
+
+      - name: Build Avalonia Language Server
+        run: |
+          dotnet build src/AvaloniaLSP/AvaloniaLanguageServer/AvaloniaLanguageServer.csproj \
+            -c Release \
+            --no-restore \
+            --output $EXT_DIR/avaloniaServer
+
+
+      - name: Build Solution Parser
+        run: |
+          dotnet build src/SolutionParser/SolutionParser.csproj \
+            -c Release \
+            --no-restore \
+            --output $EXT_DIR/solutionParserTool
+
+      - name: Compile extension
+        working-directory: ${{ env.EXT_DIR }}
+        run: npm run compile
+
+      - name: Install VSCE
+        run: npm install -g @vscode/vsce
+
+      - name: Set extension version
+        working-directory: ${{ env.EXT_DIR }}
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          npm version $VERSION --no-git-tag-version
+
+      - name: Package extension
+        working-directory: ${{ env.EXT_DIR }}
+        run: vsce package
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-extension
+          path: ${{ env.EXT_DIR }}/*.vsix
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: ${{ env.EXT_DIR }}/*.vsix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd ./src/vscode-avalonia
-yarn install
+npm install
 
 cd ..
 
@@ -13,4 +13,5 @@ dotnet build $PWD/AvaloniaLSP/AvaloniaLanguageServer/AvaloniaLanguageServer.cspr
 # Build  Solution parser
 dotnet build $PWD/SolutionParser/SolutionParser.csproj /property:GenerateFullPaths=true --output $PWD/vscode-avalonia/solutionParserTool
 
-echo 🎉 Great success
+cd ./vscode-avalonia
+npm run compile
