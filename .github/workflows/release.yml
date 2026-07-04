@@ -1,9 +1,12 @@
 name: Build and Release VSCode Extension
 
 on:
-  push:
-    tags:
-      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (1.2.3)."
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -56,16 +59,18 @@ jobs:
         run: dotnet restore
 
       - name: Build Avalonia Language Server
+        working-directory: ${{ env.EXT_DIR }}
         run: |
-          dotnet build src/AvaloniaLSP/AvaloniaLanguageServer/AvaloniaLanguageServer.csproj \
+          dotnet build ../AvaloniaLSP/AvaloniaLanguageServer/AvaloniaLanguageServer.csproj \
             -c Release \
             --no-restore \
             --output $EXT_DIR/avaloniaServer
 
 
       - name: Build Solution Parser
+        working-directory: ${{ env.EXT_DIR }}
         run: |
-          dotnet build src/SolutionParser/SolutionParser.csproj \
+          dotnet build ../SolutionParser/SolutionParser.csproj \
             -c Release \
             --no-restore \
             --output $EXT_DIR/solutionParserTool
